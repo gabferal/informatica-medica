@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Estudiante - Informática Médica{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 fw-bold text-dark">
+                <i class="bi bi-house-fill text-success me-2"></i>
+                Dashboard Estudiante
+            </h1>
+            <p class="text-muted">Bienvenido/a, {{ current_user.get_full_name() }}</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Tareas Subidas</h6>
+                            <h2 class="mb-0">{{ total_assignments }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-file-earmark-text" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Materiales</h6>
+                            <h2 class="mb-0">{{ total_materials }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-book" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Mensajes</h6>
+                            <h2 class="mb-0">{{ unread_messages }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-envelope" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Mi ID</h6>
+                            <h6 class="mb-0">{{ current_user.student_id }}</h6>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-person-badge" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history text-primary me-2"></i>
+                        Tareas Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_assignments %}
+                        {% for assignment in recent_assignments %}
+                        <div class="d-flex align-items-center mb-3 {% if not loop.last %}border-bottom pb-3{% endif %}">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-file-earmark-text text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ assignment.title }}</h6>
+                                <small class="text-muted">
+                                    {{ assignment.submitted_at.strftime('%d/%m/%Y %H:%M') }}
+                                </small>
+                                {% if assignment.status == 'graded' %}
+                                    <span class="badge bg-success ms-2">Calificado</span>
+                                {% elif assignment.status == 'reviewed' %}
+                                    <span class="badge bg-info ms-2">Revisado</span>
+                                {% else %}
+                                    <span class="badge bg-warning ms-2">Enviado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="text-center">
+                            <a href="{{ url_for('student.assignments') }}" class="btn btn-outline-primary btn-sm">
+                                Ver Todas las Tareas
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No has subido tareas aún</p>
+                            <a href="{{ url_for('student.assignments') }}" class="btn btn-primary btn-sm">
+                                Subir Primera Tarea
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-book text-success me-2"></i>
+                        Materiales Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_materials %}
+                        {% for material in recent_materials %}
+                        <div class="d-flex align-items-center mb-3 {% if not loop.last %}border-bottom pb-3{% endif %}">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-file-pdf text-danger"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ material.title }}</h6>
+                                <small class="text-muted">
+                                    {{ material.uploaded_at.strftime('%d/%m/%Y') }}
+                                </small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="{{ url_for('student.download_material', material_id=material.id) }}" 
+                                   class="btn btn-outline-success btn-sm">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="text-center">
+                            <a href="{{ url_for('student.materials') }}" class="btn btn-outline-success btn-sm">
+                                Ver Todos los Materiales
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-book text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No hay materiales disponibles</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,338 @@
+/* Variables CSS inspiradas en iOS */
+:root {
+    --primary-green: #34C759;
+    --secondary-green: #30B050;
+    --light-green: #E8F5E8;
+    --dark-green: #248A3D;
+    --ios-blue: #007AFF;
+    --ios-gray: #8E8E93;
+    --ios-light-gray: #F2F2F7;
+    --ios-dark-gray: #1C1C1E;
+    --ios-red: #FF3B30;
+    --ios-orange: #FF9500;
+    --ios-yellow: #FFCC00;
+    --border-radius: 12px;
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos globales */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--ios-light-gray);
+    color: var(--ios-dark-gray);
+    line-height: 1.6;
+}
+
+/* Navegación */
+.navbar {
+    backdrop-filter: blur(20px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: var(--light-green);
+    color: var(--dark-green) !important;
+}
+
+/* Contenido principal */
+.main-content {
+    margin-top: 76px;
+    min-height: calc(100vh - 76px);
+}
+
+/* Tarjetas */
+.card {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+}
+
+/* Botones con estilo iOS */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+    padding: 0.5rem 1rem;
+}
+
+.btn-success {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: var(--secondary-green);
+    transform: scale(1.02);
+}
+
+.btn-primary {
+    background-color: var(--ios-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056CC;
+    transform: scale(1.02);
+}
+
+.btn-outline-success {
+    border: 2px solid var(--primary-green);
+    color: var(--primary-green);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+    color: white;
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--ios-blue);
+    color: var(--ios-blue);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--ios-blue);
+    border-color: var(--ios-blue);
+    color: white;
+}
+
+/* Formularios */
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #E5E5EA;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.form-control:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(52, 199, 89, 0.25);
+}
+
+.input-group-text {
+    border-radius: 10px 0 0 10px;
+    border: 2px solid #E5E5EA;
+    border-right: none;
+    background-color: var(--ios-light-gray);
+    color: var(--ios-gray);
+}
+
+/* Badges */
+.badge {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Alertas */
+.alert {
+    border-radius: var(--border-radius);
+    border: none;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: var(--light-green);
+    color: var(--dark-green);
+}
+
+.alert-danger {
+    background-color: #FFE5E5;
+    color: var(--ios-red);
+}
+
+.alert-warning {
+    background-color: #FFF4E5;
+    color: var(--ios-orange);
+}
+
+.alert-info {
+    background-color: #E5F3FF;
+    color: var(--ios-blue);
+}
+
+/* Tablas */
+.table {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(52, 199, 89, 0.05);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: var(--ios-gray);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Sección hero */
+.hero-section {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Iconos de características */
+.feature-icon {
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.card:hover .feature-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Barras de progreso */
+.progress {
+    border-radius: 10px;
+    background-color: #E5E5EA;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+/* Modales */
+.modal-content {
+    border-radius: var(--border-radius);
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-green);
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--dark-green);
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .main-content {
+        margin-top: 66px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    h1, .h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Estados de archivos */
+.file-item {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.file-item:hover {
+    background-color: var(--ios-light-gray);
+}
+
+/* Mensajes no leídos */
+.unread-message {
+    border-left: 4px solid var(--primary-green);
+    background-color: rgba(52, 199, 89, 0.05);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--ios-light-gray);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ios-gray);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Filtro de nl2br para mantener saltos de línea */
+.message-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}

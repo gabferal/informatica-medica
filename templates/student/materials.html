@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Materiales - Informática Médica{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 fw-bold text-dark">
+                <i class="bi bi-book text-success me-2"></i>
+                Materiales del Curso
+            </h1>
+            <p class="text-muted">Descarga los materiales, presentaciones y recursos del curso</p>
+        </div>
+    </div>
+
+    <!-- Materials Grid -->
+    <div class="row">
+        {% if materials %}
+            {% for material in materials %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="flex-shrink-0">
+                                {% set file_ext = material.filename.split('.')[-1].lower() %}
+                                {% if file_ext == 'pdf' %}
+                                    <i class="bi bi-file-pdf text-danger" style="font-size: 2.5rem;"></i>
+                                {% elif file_ext in ['doc', 'docx'] %}
+                                    <i class="bi bi-file-word text-primary" style="font-size: 2.5rem;"></i>
+                                {% elif file_ext in ['ppt', 'pptx'] %}
+                                    <i class="bi bi-file-ppt text-warning" style="font-size: 2.5rem;"></i>
+                                {% elif file_ext in ['xls', 'xlsx'] %}
+                                    <i class="bi bi-file-excel text-success" style="font-size: 2.5rem;"></i>
+                                {% elif file_ext in ['png', 'jpg', 'jpeg', 'gif'] %}
+                                    <i class="bi bi-file-image text-info" style="font-size: 2.5rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-file-earmark text-secondary" style="font-size: 2.5rem;"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-2">{{ material.title }}</h5>
+                                {% if material.description %}
+                                    <p class="card-text text-muted small">{{ material.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar me-1"></i>
+                                {{ material.uploaded_at.strftime('%d/%m/%Y') }}
+                            </small>
+                            <small class="text-muted">
+                                {{ "%.1f"|format(material.file_size / 1024 / 1024) }} MB
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ material.filename }}</small>
+                            <a href="{{ url_for('student.download_material', material_id=material.id) }}" 
+                               class="btn btn-success btn-sm">
+                                <i class="bi bi-download me-1"></i>Descargar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="bi bi-book text-muted" style="font-size: 5rem;"></i>
+                    <h4 class="text-muted mt-3">No hay materiales disponibles</h4>
+                    <p class="text-muted">Los materiales del curso aparecerán aquí cuando el profesor los suba</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

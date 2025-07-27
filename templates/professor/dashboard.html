@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Profesor - Informática Médica{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 fw-bold text-dark">
+                <i class="bi bi-house-fill text-success me-2"></i>
+                Dashboard Profesor
+            </h1>
+            <p class="text-muted">Panel de control y estadísticas del curso</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Estudiantes</h6>
+                            <h2 class="mb-0">{{ total_students }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-people" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Tareas Recibidas</h6>
+                            <h2 class="mb-0">{{ total_assignments }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-file-earmark-text" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Pendientes</h6>
+                            <h2 class="mb-0">{{ pending_reviews }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-clock" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Materiales</h6>
+                            <h2 class="mb-0">{{ total_materials }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-book" style="font-size: 2rem; opacity: 0.7;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning text-warning me-2"></i>
+                        Acciones Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('professor.send_message') }}" class="btn btn-outline-primary w-100 p-3">
+                                <i class="bi bi-envelope-plus d-block mb-2" style="font-size: 2rem;"></i>
+                                Enviar Mensaje
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('professor.materials') }}" class="btn btn-outline-success w-100 p-3">
+                                <i class="bi bi-upload d-block mb-2" style="font-size: 2rem;"></i>
+                                Subir Material
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('professor.students') }}" class="btn btn-outline-info w-100 p-3">
+                                <i class="bi bi-people d-block mb-2" style="font-size: 2rem;"></i>
+                                Ver Estudiantes
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-warning w-100 p-3" onclick="window.location.reload()">
+                                <i class="bi bi-arrow-clockwise d-block mb-2" style="font-size: 2rem;"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-people text-primary me-2"></i>
+                        Estudiantes Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_students %}
+                        {% for student in recent_students %}
+                        <div class="d-flex align-items-center mb-3 {% if not loop.last %}border-bottom pb-3{% endif %}">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-person-circle text-primary" style="font-size: 2rem;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ student.get_full_name() }}</h6>
+                                <small class="text-muted">{{ student.student_id }}</small>
+                                <br><small class="text-muted">
+                                    Registrado: {{ student.created_at.strftime('%d/%m/%Y') }}
+                                </small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="{{ url_for('professor.student_assignments', student_id=student.id) }}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    Ver Tareas
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No hay estudiantes registrados</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-file-earmark-text text-success me-2"></i>
+                        Tareas Recientes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_assignments %}
+                        {% for assignment in recent_assignments %}
+                        <div class="d-flex align-items-center mb-3 {% if not loop.last %}border-bottom pb-3{% endif %}">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-file-earmark-text text-success"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-1">{{ assignment.title }}</h6>
+                                <small class="text-muted">{{ assignment.student.get_full_name() }}</small>
+                                <br><small class="text-muted">
+                                    {{ assignment.submitted_at.strftime('%d/%m/%Y %H:%M') }}
+                                </small>
+                                {% if assignment.status == 'submitted' %}
+                                    <span class="badge bg-warning ms-2">Pendiente</span>
+                                {% elif assignment.status == 'graded' %}
+                                    <span class="badge bg-success ms-2">Calificado</span>
+                                {% else %}
+                                    <span class="badge bg-info ms-2">Revisado</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="{{ url_for('professor.download_assignment', assignment_id=assignment.id) }}" 
+                                   class="btn btn-outline-success btn-sm">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No hay tareas enviadas</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

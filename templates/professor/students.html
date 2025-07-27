@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Estudiantes - Informática Médica{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 fw-bold text-dark">
+                <i class="bi bi-people text-primary me-2"></i>
+                Estudiantes Registrados
+            </h1>
+            <p class="text-muted">Lista de estudiantes y sus estadísticas</p>
+        </div>
+    </div>
+
+    <!-- Students Grid -->
+    <div class="row">
+        {% if students %}
+            {% for student in students %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-person-circle text-primary" style="font-size: 3rem;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1">{{ student.get_full_name() }}</h5>
+                                <p class="card-text text-muted mb-0">{{ student.student_id }}</p>
+                                <small class="text-muted">{{ student.email }}</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <div class="bg-light rounded p-2">
+                                    <h6 class="mb-0 text-success">{{ student.assignment_count }}</h6>
+                                    <small class="text-muted">Tareas</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="bg-light rounded p-2">
+                                    <h6 class="mb-0 text-info">
+                                        {% if student.latest_assignment %}
+                                            {{ student.latest_assignment.submitted_at.strftime('%d/%m') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">Última tarea</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <small class="text-muted">
+                                Registrado: {{ student.created_at.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-top">
+                        <div class="d-grid">
+                            <a href="{{ url_for('professor.student_assignments', student_id=student.id) }}" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-file-earmark-text me-1"></i>
+                                Ver Tareas ({{ student.assignment_count }})
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="bi bi-people text-muted" style="font-size: 5rem;"></i>
+                    <h4 class="text-muted mt-3">No hay estudiantes registrados</h4>
+                    <p class="text-muted">Los estudiantes aparecerán aquí cuando se registren</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
