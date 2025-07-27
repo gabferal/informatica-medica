@@ -66,7 +66,6 @@ def create_app():
         return render_template('index.html')
     
     # Crear carpetas necesarias
-    @app.before_request
     def create_folders():
         folders = [
             app.config['UPLOAD_FOLDER'],
@@ -79,6 +78,7 @@ def create_app():
     
     # Crear tablas de la base de datos
     with app.app_context():
+        create_folders()
         db.create_all()
         
         # Crear usuario profesor por defecto si no existe
@@ -101,7 +101,5 @@ app = create_app()
 
 if __name__ == '__main__':
     # Para desarrollo local
-    app.run(debug=True, host='0.0.0.0', port=5000)
-else:
-    # Para producción con Gunicorn
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
