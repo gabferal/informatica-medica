@@ -67,7 +67,21 @@ def create_app():
 
     @app.route('/health')
     def health_check():
-        return {'status': 'healthy'}, 200
+    """Health check endpoint for Fly.io"""
+    try:
+        # Verificar conexión a base de datos
+        db.session.execute('SELECT 1')
+        return {
+            'status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'database': 'connected'
+        }, 200
+    except Exception as e:
+        return {
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }, 500
 
     # Crear carpetas necesarias
     def create_folders():
