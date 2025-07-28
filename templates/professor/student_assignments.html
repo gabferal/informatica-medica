@@ -21,7 +21,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <p class="mb-1"><strong>Email:</strong> {{ student.email }}</p>
-                    <p class="mb-1"><strong>Fecha de registro:</strong> {{ student.created_at.strftime('%d/%m/%Y') }}</p>
+                    {% if student.created_at %}
+                        <p class="mb-1"><strong>Fecha de registro:</strong> {{ student.created_at.strftime('%d/%m/%Y') }}</p>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <p class="mb-1"><strong>Total de tareas:</strong> {{ assignments|length }}</p>
@@ -60,7 +62,11 @@
                         <div class="mb-3">
                             <small class="text-muted">
                                 <i class="fas fa-calendar me-1"></i>
-                                Subido: {{ assignment.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                {% if assignment.submitted_at %}
+                                    Subido: {{ assignment.submitted_at.strftime('%d/%m/%Y %H:%M') }}
+                                {% else %}
+                                    Fecha no disponible
+                                {% endif %}
                             </small>
                         </div>
 
@@ -176,4 +182,4 @@
     font-size: 0.8rem;
 }
 </style>
-{% endblock %}  
+{% endblock %}
