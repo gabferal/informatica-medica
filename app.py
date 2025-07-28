@@ -64,7 +64,11 @@ def create_app():
             else:
                 return redirect(url_for('student.dashboard'))
         return render_template('index.html')
-    
+
+    @app.route('/health')
+    def health_check():
+        return {'status': 'healthy'}, 200
+
     # Crear carpetas necesarias
     def create_folders():
         folders = [
