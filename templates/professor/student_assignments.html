@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Tareas de {{ student.first_name }} {{ student.last_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header con información del estudiante -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-graduate me-2"></i>
+                    Tareas de {{ student.first_name }} {{ student.last_name }}
+                </h4>
+                <a href="{{ url_for('professor.dashboard') }}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i>Volver al Dashboard
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Email:</strong> {{ student.email }}</p>
+                    <p class="mb-1"><strong>Fecha de registro:</strong> {{ student.created_at.strftime('%d/%m/%Y') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Total de tareas:</strong> {{ assignments|length }}</p>
+                    <p class="mb-1"><strong>Estado:</strong> 
+                        <span class="badge bg-success">Activo</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de tareas -->
+    {% if assignments %}
+        <div class="row">
+            {% for assignment in assignments %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-file-alt me-2"></i>
+                            {{ assignment.title }}
+                        </h6>
+                        {% if assignment.grade %}
+                            <span class="badge bg-success">{{ assignment.grade }}/10</span>
+                        {% else %}
+                            <span class="badge bg-warning">Sin calificar</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% if assignment.description %}
+                            <p class="card-text text-muted small mb-3">
+                                {{ assignment.description[:100] }}{% if assignment.description|length > 100 %}...{% endif %}
+                            </p>
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Subido: {{ assignment.created_at.strftime('%d/%m/%Y %H:%M') }}
+                            </small>
+                        </div>
+
+                        {% if assignment.feedback %}
+                            <div class="alert alert-info py-2 small">
+                                <strong>Feedback:</strong><br>
+                                {{ assignment.feedback|nl2br|safe }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex gap-2">
+                            <!-- Botón para descargar archivo -->
+                            {% if assignment.file_path %}
+                                <a href="{{ url_for('professor.download_assignment', assignment_id=assignment.id) }}" 
+                                   class="btn btn-outline-primary btn-sm flex-fill">
+                                    <i class="fas fa-download me-1"></i>Descargar
+                                </a>
+                            {% endif %}
+                            
+                            <!-- Botón para calificar -->
+                            <button type="button" 
+                                    class="btn btn-primary btn-sm flex-fill" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#gradeModal{{ assignment.id }}">
+                                <i class="fas fa-star me-1"></i>
+                                {% if assignment.grade %}Editar Nota{% else %}Calificar{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para calificar -->
+            <div class="modal fade" id="gradeModal{{ assignment.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form method="POST" action="{{ url_for('professor.grade_assignment', assignment_id=assignment.id) }}">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-star me-2"></i>
+                                    Calificar: {{ assignment.title }}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="grade{{ assignment.id }}" class="form-label">Calificación (0-10)</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="grade{{ assignment.id }}" 
+                                           name="grade" 
+                                           min="0" 
+                                           max="10" 
+                                           step="0.1"
+                                           value="{{ assignment.grade or '' }}" 
+                                           required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="feedback{{ assignment.id }}" class="form-label">Comentarios</label>
+                                    <textarea class="form-control" 
+                                              id="feedback{{ assignment.id }}" 
+                                              name="feedback" 
+                                              rows="4" 
+                                              placeholder="Escribe comentarios sobre la tarea...">{{ assignment.feedback or '' }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Guardar Calificación
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Estado vacío -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-inbox fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No hay tareas subidas</h4>
+            <p class="text-muted">{{ student.first_name }} aún no ha subido ninguna tarea.</p>
+            <a href="{{ url_for('professor.dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i>Volver al Dashboard
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+.btn-sm {
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %}  
