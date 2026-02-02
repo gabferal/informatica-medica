@@ -223,7 +223,7 @@ def delete_material(material_id):
 def messages():
     sent_messages = Message.query.filter_by(
         sender_id=current_user.id
-    ).order_at(Message.created_at.desc()).all()
+    ).order_by(Message.created_at.desc()).all()
     return render_template('professor/messages.html', messages=sent_messages)
 
 @professor_bp.route('/send_message', methods=['GET', 'POST'])
