@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class="container py-4">
-    <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
             <h1 class="h3 fw-bold text-dark">
@@ -15,7 +14,6 @@
         </div>
     </div>
 
-    <!-- Upload Section -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="card">
@@ -59,7 +57,6 @@
         </div>
     </div>
 
-    <!-- Materials List -->
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -121,7 +118,7 @@
                                     <div class="card-footer bg-white border-top">
                                         {% if material.is_active %}
                                             <div class="d-flex justify-content-between">
-                                                <a href="{{ url_for('student.download_material', material_id=material.id) }}" 
+                                                <a href="{{ url_for('professor.download_material', material_id=material.id) }}" 
                                                    class="btn btn-outline-primary btn-sm">
                                                     <i class="bi bi-download me-1"></i>Descargar
                                                 </a>

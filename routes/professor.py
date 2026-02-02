@@ -25,19 +25,16 @@ def professor_required(f):
 @login_required
 @professor_required
 def dashboard():
-    # Estadísticas para el dashboard del profesor
     total_students = User.query.filter_by(role='student', is_active=True).count()
     total_assignments = Assignment.query.count()
     total_materials = Material.query.filter_by(is_active=True).count()
     pending_reviews = Assignment.query.filter_by(status='submitted').count()
     
-    # Estudiantes recientes
     recent_students = User.query.filter_by(
         role='student',
         is_active=True
     ).order_by(User.created_at.desc()).limit(5).all()
     
-    # Tareas recientes
     recent_assignments = Assignment.query.order_by(
         Assignment.submitted_at.desc()
     ).limit(5).all()
@@ -54,10 +51,7 @@ def dashboard():
 @login_required
 @professor_required
 def students():
-    # Obtener todos los estudiantes y sus estadísticas
     students = User.query.filter_by(role='student', is_active=True).all()
-    
-    # Agregar estadísticas a cada estudiante
     for student in students:
         student.assignment_count = Assignment.query.filter_by(student_id=student.id).count()
         student.latest_assignment = Assignment.query.filter_by(
@@ -71,7 +65,6 @@ def students():
 @professor_required
 def student_assignments(student_id):
     student = User.query.get_or_404(student_id)
-    
     if not student.is_student():
         flash('Usuario no encontrado.', 'error')
         return redirect(url_for('professor.students'))
@@ -89,7 +82,6 @@ def student_assignments(student_id):
 @professor_required
 def download_assignment(assignment_id):
     assignment = Assignment.query.get_or_404(assignment_id)
-    
     try:
         return send_file(assignment.file_path, as_attachment=True, download_name=assignment.filename)
     except FileNotFoundError:
@@ -101,7 +93,6 @@ def download_assignment(assignment_id):
 @professor_required
 def grade_assignment(assignment_id):
     assignment = Assignment.query.get_or_404(assignment_id)
-    
     grade = request.form.get('grade')
     feedback = request.form.get('feedback', '').strip()
     
@@ -111,21 +102,20 @@ def grade_assignment(assignment_id):
             if grade < 0 or grade > 10:
                 flash('La calificación debe estar entre 0 y 10.', 'error')
                 return redirect(request.referrer)
-            
             assignment.grade = grade
         
         assignment.feedback = feedback
         assignment.status = 'graded' if grade else 'reviewed'
-        
         db.session.commit()
         flash('Calificación guardada exitosamente.', 'success')
-        
     except ValueError:
         flash('La calificación debe ser un número válido.', 'error')
     except Exception as e:
         flash('Error al guardar la calificación.', 'error')
     
     return redirect(request.referrer)
+
+# --- SECCIÓN DE MATERIALES ACTUALIZADA ---
 
 @professor_bp.route('/materials')
 @login_required
@@ -134,8 +124,26 @@ def materials():
     materials = Material.query.filter_by(
         uploaded_by=current_user.id
     ).order_by(Material.uploaded_at.desc()).all()
-    
     return render_template('professor/materials.html', materials=materials)
+
+@professor_bp.route('/download_material/<int:material_id>')
+@login_required
+@professor_required
+def download_material(material_id):
+    """Permite al profesor descargar o visualizar los materiales subidos"""
+    material = Material.query.get_or_404(material_id)
+    try:
+        return send_file(
+            material.file_path, 
+            as_attachment=True, 
+            download_name=material.filename
+        )
+    except FileNotFoundError:
+        flash('El archivo físico no se encuentra en el servidor.', 'error')
+        return redirect(url_for('professor.materials'))
+    except Exception as e:
+        flash(f'Error al descargar el archivo: {str(e)}', 'error')
+        return redirect(url_for('professor.materials'))
 
 @professor_bp.route('/upload_material', methods=['POST'])
 @login_required
@@ -149,12 +157,8 @@ def upload_material():
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
     
-    if file.filename == '':
-        flash('No se seleccionó ningún archivo.', 'error')
-        return redirect(url_for('professor.materials'))
-    
-    if not title:
-        flash('El título es obligatorio.', 'error')
+    if file.filename == '' or not title:
+        flash('El título y el archivo son obligatorios.', 'error')
         return redirect(url_for('professor.materials'))
     
     if file and allowed_file(file.filename):
@@ -163,7 +167,12 @@ def upload_material():
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             filename = f"material_{timestamp}_{filename}"
             
-            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'materials', filename)
+            # Asegurar que el directorio existe
+            upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'materials')
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
+
+            file_path = os.path.join(upload_dir, filename)
             file.save(file_path)
             
             material = Material(
@@ -178,11 +187,11 @@ def upload_material():
             
             db.session.add(material)
             db.session.commit()
-            
             flash('Material subido exitosamente.', 'success')
             
         except Exception as e:
-            flash('Error al subir el material. Inténtalo nuevamente.', 'error')
+            db.session.rollback()
+            flash('Error al subir el material.', 'error')
     else:
         flash('Tipo de archivo no permitido.', 'error')
     
@@ -193,7 +202,6 @@ def upload_material():
 @professor_required
 def delete_material(material_id):
     material = Material.query.get_or_404(material_id)
-    
     if material.uploaded_by != current_user.id:
         flash('No tienes permisos para eliminar este material.', 'error')
         return redirect(url_for('professor.materials'))
@@ -207,14 +215,15 @@ def delete_material(material_id):
     
     return redirect(url_for('professor.materials'))
 
+# --- SECCIÓN DE MENSAJERÍA ---
+
 @professor_bp.route('/messages')
 @login_required
 @professor_required
 def messages():
     sent_messages = Message.query.filter_by(
         sender_id=current_user.id
-    ).order_by(Message.created_at.desc()).all()
-    
+    ).order_at(Message.created_at.desc()).all()
     return render_template('professor/messages.html', messages=sent_messages)
 
 @professor_bp.route('/send_message', methods=['GET', 'POST'])
@@ -231,10 +240,6 @@ def send_message():
             flash('El asunto y contenido son obligatorios.', 'error')
             return redirect(url_for('professor.send_message'))
         
-        if not recipients and not is_announcement:
-            flash('Debes seleccionar al menos un destinatario.', 'error')
-            return redirect(url_for('professor.send_message'))
-        
         try:
             message = Message(
                 subject=subject,
@@ -242,36 +247,23 @@ def send_message():
                 sender_id=current_user.id,
                 is_announcement=is_announcement
             )
-            
             db.session.add(message)
-            db.session.flush()  # Para obtener el ID del mensaje
+            db.session.flush() 
             
-            # Si es un anuncio, enviar a todos los estudiantes
             if is_announcement:
                 students = User.query.filter_by(role='student', is_active=True).all()
                 for student in students:
-                    recipient = MessageRecipient(
-                        message_id=message.id,
-                        recipient_id=student.id
-                    )
-                    db.session.add(recipient)
+                    db.session.add(MessageRecipient(message_id=message.id, recipient_id=student.id))
             else:
-                # Enviar a destinatarios específicos
                 for recipient_id in recipients:
-                    recipient = MessageRecipient(
-                        message_id=message.id,
-                        recipient_id=int(recipient_id)
-                    )
-                    db.session.add(recipient)
+                    db.session.add(MessageRecipient(message_id=message.id, recipient_id=int(recipient_id)))
             
             db.session.commit()
             flash('Mensaje enviado exitosamente.', 'success')
             return redirect(url_for('professor.messages'))
-            
         except Exception as e:
             db.session.rollback()
             flash('Error al enviar el mensaje.', 'error')
     
-    # Obtener lista de estudiantes para el formulario
     students = User.query.filter_by(role='student', is_active=True).order_by(User.first_name, User.last_name).all()
     return render_template('professor/send_message.html', students=students)
